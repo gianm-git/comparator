@@ -1,0 +1,4 @@
+display.c:5:6:LCDinit	8	static
+display.c:13:6:display	16	static
+display.c:18:6:ValueDisplay	40	static
+display.c:109:5:UserInterface	8	static

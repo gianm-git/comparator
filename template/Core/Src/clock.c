@@ -22,7 +22,10 @@ void Error_Handler(void)
     while(1);
 }
 */
-void Fast_Config(void)
+
+///This is Dan's clock original function just renamed
+///It makes the cpu go to 80MHz disabling the power clock control (power management is off)
+void setFastClockConfig(void)
 {
   /* oscillator and clocks configs */
   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};

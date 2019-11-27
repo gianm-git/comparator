@@ -1,0 +1,6 @@
+main.c:199:6:SystemClock_Config	248	static
+main.c:867:6:initLEDS	48	static
+main.c:114:5:main	80	static
+main.c:896:6:TIM4_IRQHandler	16	static
+main.c:937:6:HAL_GPIO_EXTI_Callback	0	static,ignoring_inline_asm
+main.c:964:6:Error_Handler	0	static

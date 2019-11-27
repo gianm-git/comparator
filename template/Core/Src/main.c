@@ -78,7 +78,8 @@ int frequency=1;
 int menuSelected=-5;
 int period=1;
 
-_Bool eightyMHz=0;
+
+_Bool eightyMHzClock=1;
 
 /* USER CODE END PV */
 
@@ -98,7 +99,7 @@ void MX_USB_HOST_Process(void);
 
 /* USER CODE BEGIN PFP */
 static void EXTI0_IRQHandler_Config(void);
-void initLEDS(void);
+void initializeLEDS(void);
 
 /* USER CODE END PFP */
 
@@ -124,13 +125,15 @@ int main(void)
   HAL_Init();
 
   /* USER CODE BEGIN Init */
-  if (eightyMHz!=1)
+
+  //if fast clock is true configure the clock at 80Mhz (Dan's code in clock.c and clock.h)
+  if (eightyMHzClock==1)
   {
-	  SystemClock_Config();
+	  setFastClockConfig();
   }
   else
   {
-	  Fast_Config();
+	  SystemClock_Config();
   }
 
 
@@ -160,7 +163,7 @@ int main(void)
   BSP_LCD_GLASS_Init();
   LCDinit();
 
-  initLEDS();
+  initializeLEDS();
 
 
   //Configure EXTI_Line0 (connected to PA.0 pin) in interrupt mode
@@ -177,11 +180,9 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 
-    menuSelected=UserInterface();
 
+    //menuSelected=UserInterface();
 
-
-    //frequency++;
     //displayADC();
     ValueDisplay(frequency,1);
 
@@ -670,18 +671,36 @@ static void MX_TIM4_Init(void)
   // see debug window
 
   //standard clock is 20MHZ 20 000 000 = 1sec
+  //fast clock is 	  80Mhz 80 000 000 = 1sec
 
   //set period =10sec to trigger manually the external interrupt
   //with pushbutton PA0 (center of joystick)
   // 20 000 000 x10 = 200 000 000
+  if (eightyMHzClock==1)
+  {
+	  //sample time for 80MHz
+	  //max Prescaler and Period is 65000
+	  htim4.Init.Prescaler = 10000;
+	  htim4.Init.Period = 8000;
+	  //reinitialize
+	  if (HAL_TIM_Base_Init(&htim4) != HAL_OK)
+	  {
+	  Error_Handler();
+	  }
 
-  htim4.Init.Prescaler = 20000;
-  htim4.Init.Period = 10000;
-  //reinitialize
-  if (HAL_TIM_Base_Init(&htim4) != HAL_OK)
-    {
+  }
+  else
+  {
+	  //sample time for 20MHz
+	  htim4.Init.Prescaler = 20000;
+	  htim4.Init.Period = 1000;
+	  //reinitialize
+	  if (HAL_TIM_Base_Init(&htim4) != HAL_OK)
+	  {
       Error_Handler();
-    }
+	  }
+  }
+
 
   HAL_TIM_Base_Start_IT(&htim4);
 
@@ -864,7 +883,7 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
-void initLEDS(void)
+void initializeLEDS(void)
 {
 	//enable clock for the two LEDS
 	__HAL_RCC_GPIOB_CLK_ENABLE();
@@ -892,7 +911,6 @@ void initLEDS(void)
 
 }
 
-
 void TIM4_IRQHandler(void)
 {
 	//RED LED toggle is to show visually the length of the timer
@@ -903,11 +921,11 @@ void TIM4_IRQHandler(void)
 
 	frequency = counter/period;
 
+	//clear interrupt flag
 	__HAL_TIM_CLEAR_FLAG(&htim4, TIM_FLAG_UPDATE);
 
-	//change counter=0
+	//reset counter=0
 	counter=0;
-
 
 }
 
@@ -941,8 +959,8 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
   {
 
     //Toggle GREEN LED
-	//the GREEN LED will show the interrupt being triggered when pressing PA0
-	  HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_8);
+	//The GREEN LED will show the interrupt being triggered when pressing PA0
+	//  HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_8);
 	//increase counter
 	  counter++;
 

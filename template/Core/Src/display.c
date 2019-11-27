@@ -15,7 +15,7 @@ void display(void) {
 	 BSP_LCD_GLASS_DisplayString(&display);
 }
 
-void ValueDisplay(double value, int choice)
+void ValueDisplay(double value, int menuChoice)
 {
 	char lcd[6];
 
