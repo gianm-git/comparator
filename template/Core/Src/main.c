@@ -56,7 +56,6 @@
 /* Private variables ---------------------------------------------------------*/
 ADC_HandleTypeDef hadc1;
 
-I2C_HandleTypeDef hi2c1;
 I2C_HandleTypeDef hi2c2;
 
 LCD_HandleTypeDef hlcd;
@@ -73,6 +72,8 @@ TIM_HandleTypeDef htim4;
 UART_HandleTypeDef huart2;
 
 /* USER CODE BEGIN PV */
+
+	//privatre variables
 int counter=0;
 int frequency=1;
 int menuSelected=-5;
@@ -86,7 +87,6 @@ _Bool eightyMHzClock=1;
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
-static void MX_I2C1_Init(void);
 static void MX_I2C2_Init(void);
 static void MX_LCD_Init(void);
 static void MX_QUADSPI_Init(void);
@@ -98,7 +98,17 @@ static void MX_TIM4_Init(void);
 void MX_USB_HOST_Process(void);
 
 /* USER CODE BEGIN PFP */
+
+//interrupt handlers according to line number
 static void EXTI0_IRQHandler_Config(void);
+static void EXTI1_IRQHandler_Config(void);
+static void EXTI2_IRQHandler_Config(void);
+static void EXTI3_IRQHandler_Config(void);
+static void EXTI4_IRQHandler_Config(void);
+static void EXTI9_5_IRQHandler_Config(void);
+static void EXTI15_10_IRQHandler_Config(void);
+
+//initialize onboard LEDS
 void initializeLEDS(void);
 
 /* USER CODE END PFP */
@@ -140,7 +150,7 @@ int main(void)
   /* USER CODE END Init */
 
   /* Configure the system clock */
-
+  //SystemClock_Config();
 
   /* USER CODE BEGIN SysInit */
 
@@ -148,7 +158,6 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  MX_I2C1_Init();
   MX_I2C2_Init();
   MX_LCD_Init();
   MX_QUADSPI_Init();
@@ -166,8 +175,17 @@ int main(void)
   initializeLEDS();
 
 
-  //Configure EXTI_Line0 (connected to PA.0 pin) in interrupt mode
-  EXTI0_IRQHandler_Config();
+  //Configure external interrupts lines
+  //use the correct handler (EXTI_XX) according to pin number
+  //EXTI0_IRQHandler_Config();
+//  EXTI1_IRQHandler_Config();
+//  EXTI2_IRQHandler_Config();
+//  EXTI3_IRQHandler_Config();
+//  EXTI4_IRQHandler_Config();
+  EXTI9_5_IRQHandler_Config();
+//  EXTI15_10_IRQHandler_Config();
+
+
 
   /* USER CODE END 2 */
 
@@ -241,11 +259,9 @@ void SystemClock_Config(void)
     Error_Handler();
   }
   PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_RTC|RCC_PERIPHCLK_USART2
-                              |RCC_PERIPHCLK_SAI1|RCC_PERIPHCLK_I2C1
-                              |RCC_PERIPHCLK_I2C2|RCC_PERIPHCLK_USB
-                              |RCC_PERIPHCLK_ADC;
+                              |RCC_PERIPHCLK_SAI1|RCC_PERIPHCLK_I2C2
+                              |RCC_PERIPHCLK_USB|RCC_PERIPHCLK_ADC;
   PeriphClkInit.Usart2ClockSelection = RCC_USART2CLKSOURCE_PCLK1;
-  PeriphClkInit.I2c1ClockSelection = RCC_I2C1CLKSOURCE_PCLK1;
   PeriphClkInit.I2c2ClockSelection = RCC_I2C2CLKSOURCE_PCLK1;
   PeriphClkInit.Sai1ClockSelection = RCC_SAI1CLKSOURCE_PLLSAI1;
   PeriphClkInit.AdcClockSelection = RCC_ADCCLKSOURCE_PLLSAI1;
@@ -335,52 +351,6 @@ static void MX_ADC1_Init(void)
   /* USER CODE BEGIN ADC1_Init 2 */
 
   /* USER CODE END ADC1_Init 2 */
-
-}
-
-/**
-  * @brief I2C1 Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_I2C1_Init(void)
-{
-
-  /* USER CODE BEGIN I2C1_Init 0 */
-
-  /* USER CODE END I2C1_Init 0 */
-
-  /* USER CODE BEGIN I2C1_Init 1 */
-
-  /* USER CODE END I2C1_Init 1 */
-  hi2c1.Instance = I2C1;
-  hi2c1.Init.Timing = 0x00404C74;
-  hi2c1.Init.OwnAddress1 = 0;
-  hi2c1.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
-  hi2c1.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
-  hi2c1.Init.OwnAddress2 = 0;
-  hi2c1.Init.OwnAddress2Masks = I2C_OA2_NOMASK;
-  hi2c1.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
-  hi2c1.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
-  if (HAL_I2C_Init(&hi2c1) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /** Configure Analogue filter 
-  */
-  if (HAL_I2CEx_ConfigAnalogFilter(&hi2c1, I2C_ANALOGFILTER_ENABLE) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /** Configure Digital filter 
-  */
-  if (HAL_I2CEx_ConfigDigitalFilter(&hi2c1, 0) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /* USER CODE BEGIN I2C1_Init 2 */
-
-  /* USER CODE END I2C1_Init 2 */
 
 }
 
@@ -655,9 +625,6 @@ static void MX_TIM4_Init(void)
   {
     Error_Handler();
   }
-
-
-
   /* USER CODE BEGIN TIM4_Init 2 */
 
 
@@ -708,7 +675,7 @@ static void MX_TIM4_Init(void)
 
   HAL_NVIC_EnableIRQ(TIM4_IRQn);
 
-    /* USER CODE END TIM4_Init 2 */
+  /* USER CODE END TIM4_Init 2 */
 
 }
 
@@ -857,6 +824,20 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
   HAL_GPIO_Init(GYRO_CS_GPIO_Port, &GPIO_InitStruct);
 
+  /*Configure GPIO pin : PB6 */
+  GPIO_InitStruct.Pin = GPIO_PIN_6;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : I2C1_SDA_Pin */
+  GPIO_InitStruct.Pin = I2C1_SDA_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_AF_OD;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+  GPIO_InitStruct.Alternate = GPIO_AF4_I2C1;
+  HAL_GPIO_Init(I2C1_SDA_GPIO_Port, &GPIO_InitStruct);
+
   /*Configure GPIO pin : GYRO_INT2_Pin */
   GPIO_InitStruct.Pin = GYRO_INT2_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_EVT_RISING;
@@ -879,6 +860,9 @@ static void MX_GPIO_Init(void)
   /* EXTI interrupt init*/
   HAL_NVIC_SetPriority(EXTI0_IRQn, 0, 0);
   HAL_NVIC_EnableIRQ(EXTI0_IRQn);
+
+  HAL_NVIC_SetPriority(EXTI9_5_IRQn, 2, 0);
+  HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);
 
 }
 
@@ -929,11 +913,28 @@ void TIM4_IRQHandler(void)
 
 }
 
-/**
-  * @brief  Configures EXTI line 0 (connected to PA.0 pin) in interrupt mode
-  * @param  None
-  * @retval None
-  */
+/*
+ * Configure external interrupts line according to number of pin
+ * LINE 0 all zero pins A0 B0 C0...
+ * LINE 1 all one  pins A1 B1 C1...
+ * .....
+ * LINE 9-5    all pins from  5 to 9
+ * LINE 10-15  all pins from 10 to 15
+ *
+ * NOTE!!
+ * As all the pins on a line share the same interrupt
+ * is best to use different lines not to have interrupt queues
+ *
+ * better not to have interrupts on pins A1 and B1 for example.
+ *
+ * Do NOT rename the IRQhandlers and the call back
+ * function HAL_GPIO_EXTI_Callback()
+ *
+ * HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+ * takes care of matching pins to interrupt line.
+ *
+ *
+ */
 static void EXTI0_IRQHandler_Config(void)
 {
   GPIO_InitTypeDef   GPIO_InitStructure;
@@ -947,10 +948,51 @@ static void EXTI0_IRQHandler_Config(void)
   GPIO_InitStructure.Pin = GPIO_PIN_0;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStructure);
 
-  // Enable and set EXTI line 0 Interrupt to the lowest priority
-  HAL_NVIC_SetPriority(EXTI0_IRQn, 2, 0);
+  // Enable and set priority level of EXTI line 0
+  HAL_NVIC_SetPriority(EXTI0_IRQn, 2, 1);
   HAL_NVIC_EnableIRQ(EXTI0_IRQn);
 }
+
+//
+//static void EXTI1_IRQHandler_Config(void)
+//{
+//}
+//
+//static void EXTI2_IRQHandler_Config(void)
+//{
+//}
+//
+//static void EXTI3_IRQHandler_Config(void)
+//{
+//}
+//
+//static void EXTI4_IRQHandler_Config(void)
+//{
+//}
+static void EXTI9_5_IRQHandler_Config(void)
+{
+GPIO_InitTypeDef   GPIO_InitStructure;
+
+  // Enable GPIOB clock
+  __HAL_RCC_GPIOB_CLK_ENABLE();
+
+  // Configure PB6 pin as input floating
+  GPIO_InitStructure.Mode = GPIO_MODE_IT_RISING;
+  GPIO_InitStructure.Pull = GPIO_NOPULL;
+  GPIO_InitStructure.Pin = GPIO_PIN_6;
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStructure);
+
+  // Enable and set EXTI line 6 Interrupt to the lowest priority
+  HAL_NVIC_SetPriority(EXTI9_5_IRQn, 2, 0);
+  HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);
+}
+//
+//static void EXTI15_10_IRQHandler_Config(void)
+//{
+//
+//}
+
+
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
@@ -965,7 +1007,15 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 	  counter++;
 
   }
-  else
+  else if (GPIO_Pin == GPIO_PIN_6)
+  {
+	  //HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_8);
+	  counter++;
+
+  }
+
+
+
   __NOP();
 }
 
