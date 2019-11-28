@@ -77,7 +77,7 @@ UART_HandleTypeDef huart2;
 int counter=0;
 int frequency=1;
 int menuSelected=-5;
-int period=1;
+double period=5.01;
 
 
 _Bool eightyMHzClock=1;
@@ -175,6 +175,7 @@ int main(void)
   initializeLEDS();
 
 
+
   //Configure external interrupts lines
   //use the correct handler (EXTI_XX) according to pin number
   //EXTI0_IRQHandler_Config();
@@ -184,6 +185,8 @@ int main(void)
 //  EXTI4_IRQHandler_Config();
   EXTI9_5_IRQHandler_Config();
 //  EXTI15_10_IRQHandler_Config();
+
+
 
 
 
@@ -643,31 +646,33 @@ static void MX_TIM4_Init(void)
   //set period =10sec to trigger manually the external interrupt
   //with pushbutton PA0 (center of joystick)
   // 20 000 000 x10 = 200 000 000
-  if (eightyMHzClock==1)
-  {
-	  //sample time for 80MHz
-	  //max Prescaler and Period is 65000
-	  htim4.Init.Prescaler = 10000;
-	  htim4.Init.Period = 8000;
-	  //reinitialize
-	  if (HAL_TIM_Base_Init(&htim4) != HAL_OK)
-	  {
-	  Error_Handler();
-	  }
+//  if (eightyMHzClock==1)
+//  {
+//	  //sample time for 80MHz
+//	  //max Prescaler and Period is 65000
+//	  htim4.Init.Prescaler = 10000;
+//	  htim4.Init.Period = 8000;
+//	  //reinitialize
+//	  if (HAL_TIM_Base_Init(&htim4) != HAL_OK)
+//	  {
+//	  Error_Handler();
+//	  }
+//
+//  }
+//  else
+//  {
+//	  //sample time for 20MHz
+//	  htim4.Init.Prescaler = 20000;
+//	  htim4.Init.Period = 1000;
+//	  //reinitialize
+//	  if (HAL_TIM_Base_Init(&htim4) != HAL_OK)
+//	  {
+//      Error_Handler();
+//	  }
+//  }
 
-  }
-  else
-  {
-	  //sample time for 20MHz
-	  htim4.Init.Prescaler = 20000;
-	  htim4.Init.Period = 1000;
-	  //reinitialize
-	  if (HAL_TIM_Base_Init(&htim4) != HAL_OK)
-	  {
-      Error_Handler();
-	  }
-  }
 
+  setSamplingTime(htim4, eightyMHzClock, &period);
 
   HAL_TIM_Base_Start_IT(&htim4);
 
