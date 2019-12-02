@@ -1,6 +1,6 @@
 #include "display.h"
 
-int menuChoice = 1;
+int menuChoice = -1;
 
 void LCDinit(void)
 {
@@ -15,7 +15,7 @@ void display(void) {
 	 BSP_LCD_GLASS_DisplayString(&display);
 }
 
-void ValueDisplay(double value, int menuChoice)
+void ValueDisplay(double value, int choice)
 {
 	char lcd[6];
 

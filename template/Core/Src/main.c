@@ -26,6 +26,7 @@
 /* USER CODE BEGIN Includes */
 
 #include <stdio.h>
+//#include <fstream>
 #include "display.h"
 #include "clock.h"
 
@@ -73,14 +74,15 @@ UART_HandleTypeDef huart2;
 
 /* USER CODE BEGIN PV */
 
-	//privatre variables
-int counter=0;
-int frequency=1;
+	//private variables
+double counter=0.0;
+double frequency=1.0;
 int menuSelected=-5;
 double period=5.01;
 
+int countVect[300];
 
-_Bool eightyMHzClock=1;
+_Bool eightyMHzClock=0;
 
 /* USER CODE END PV */
 
@@ -167,6 +169,7 @@ int main(void)
   MX_USB_HOST_Init();
   MX_ADC1_Init();
   MX_TIM4_Init();
+
   /* USER CODE BEGIN 2 */
 
   BSP_LCD_GLASS_Init();
@@ -174,19 +177,24 @@ int main(void)
 
   initializeLEDS();
 
+  //std::ofstream ofs ("test.txt", std::ofstream::out);
+
+  //ofs << "lorem ipsum";
+
+  //ofs.close();
+
+  //ofstream outputfile("freq.txt");
 
 
-  //Configure external interrupts lines
-  //use the correct handler (EXTI_XX) according to pin number
-  //EXTI0_IRQHandler_Config();
+//	Configure external interrupts lines
+//	use the correct handler (EXTI_XX) according to pin number
+//	EXTI0_IRQHandler_Config();
 //  EXTI1_IRQHandler_Config();
 //  EXTI2_IRQHandler_Config();
 //  EXTI3_IRQHandler_Config();
 //  EXTI4_IRQHandler_Config();
-  EXTI9_5_IRQHandler_Config();
+  	EXTI9_5_IRQHandler_Config();
 //  EXTI15_10_IRQHandler_Config();
-
-
 
 
 
@@ -202,10 +210,10 @@ int main(void)
     /* USER CODE BEGIN 3 */
 
 
-    //menuSelected=UserInterface();
+    UserInterface();
 
     //displayADC();
-    ValueDisplay(frequency,1);
+    ValueDisplay(frequency,0);
 
 
 
@@ -671,12 +679,14 @@ static void MX_TIM4_Init(void)
 //	  }
 //  }
 
+//function to initialise the timer with correct period and prescaler according to the clock
+// and set the sampling time
 
   setSamplingTime(htim4, eightyMHzClock, &period);
 
   HAL_TIM_Base_Start_IT(&htim4);
 
-  HAL_NVIC_SetPriority(TIM4_IRQn, 7, 0); // middle priority
+  HAL_NVIC_SetPriority(TIM4_IRQn, 1, 0); // middle priority
 
   HAL_NVIC_EnableIRQ(TIM4_IRQn);
 
@@ -909,12 +919,24 @@ void TIM4_IRQHandler(void)
 	//HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_8);
 
 	frequency = counter/period;
+	//ValueDisplay(frequency,0);
+//	vector[i]=frequency;
+//	countVect[i]=counter;
+//	i++;
+//		if (i>300)
+//		{
+//		i=0;
+//		}
+
 
 	//clear interrupt flag
 	__HAL_TIM_CLEAR_FLAG(&htim4, TIM_FLAG_UPDATE);
 
+
 	//reset counter=0
 	counter=0;
+	//copy in vector
+
 
 }
 
@@ -954,7 +976,7 @@ static void EXTI0_IRQHandler_Config(void)
   HAL_GPIO_Init(GPIOA, &GPIO_InitStructure);
 
   // Enable and set priority level of EXTI line 0
-  HAL_NVIC_SetPriority(EXTI0_IRQn, 2, 1);
+  HAL_NVIC_SetPriority(EXTI0_IRQn, 2, 0);
   HAL_NVIC_EnableIRQ(EXTI0_IRQn);
 }
 
@@ -988,7 +1010,7 @@ GPIO_InitTypeDef   GPIO_InitStructure;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStructure);
 
   // Enable and set EXTI line 6 Interrupt to the lowest priority
-  HAL_NVIC_SetPriority(EXTI9_5_IRQn, 2, 0);
+  HAL_NVIC_SetPriority(EXTI9_5_IRQn, 0, 0);
   HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);
 }
 //
@@ -1002,7 +1024,7 @@ GPIO_InitTypeDef   GPIO_InitStructure;
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
 
-  if (GPIO_Pin == GPIO_PIN_0)
+  if (GPIO_Pin == GPIO_PIN_6)
   {
 
     //Toggle GREEN LED
@@ -1012,12 +1034,12 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 	  counter++;
 
   }
-  else if (GPIO_Pin == GPIO_PIN_6)
-  {
-	  //HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_8);
-	  counter++;
-
-  }
+//  else if (GPIO_Pin == GPIO_PIN_6)
+//  {
+//	  //HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_8);
+//	  counter++;
+//
+//  }
 
 
 

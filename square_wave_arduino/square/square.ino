@@ -43,12 +43,9 @@ void setup()
 void loop() 
 {
   //digitalWrite(10,HIGH);
-  //cli();
-  //noInterrupts();
   PORTB |= 0B00000100;
-  _delay_us(498);
+  _delay_us(550);
   //digitalWrite(10,LOW);
   PORTB &= 0B11111011;
-  _delay_us(498);
-  //sei();
+  _delay_us(550);
 }

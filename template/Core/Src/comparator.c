@@ -12,25 +12,29 @@ void setSamplingTime(TIM_HandleTypeDef htim4,_Bool fastClockBoolean, double *per
 	  {
 		  //sample time for 80MHz=80 000 000
 		  //1   sec 	80 000 000
-		  //0.1 sec		8 000 000
-		  //0.01 sec	800 000
+		  //0.1 sec		 8 000 000
+		  //0.01 sec	   800 000
 		  //maximum for Prescaler and Period is 65000
 		  htim4.Init.Prescaler = 1000;
-		  htim4.Init.Period = 800;
+		  htim4.Init.Period = 8000;
 		  //reinitialize for 80MHZ clock
 		  if (HAL_TIM_Base_Init(&htim4) != HAL_OK)
 		  {
 		  Error_Handler();
 		  }
 
-		  *period=0.01;
+		  *period=0.1;
 
 
 	  }
 	  else
 	  {
-		  //sample time for 20MHz
-		  htim4.Init.Prescaler = 20000;
+		  //sample time for 20MHz = 20 000 000
+		  //  1 sec		20 000 000
+		  //0.1 sec		 2 000 000
+		  //0.01 sec	   200 000
+
+		  htim4.Init.Prescaler = 2000;
 		  htim4.Init.Period = 1000;
 		  //reinitialize for 80MHZ clock
 		  if (HAL_TIM_Base_Init(&htim4) != HAL_OK)
@@ -38,7 +42,7 @@ void setSamplingTime(TIM_HandleTypeDef htim4,_Bool fastClockBoolean, double *per
 	      Error_Handler();
 		  }
 
-		  *period=0.01;
+		  *period=0.1;
 
 
 

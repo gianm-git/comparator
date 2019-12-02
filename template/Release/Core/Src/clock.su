@@ -1,1 +1,1 @@
-clock.c:25:6:Fast_Config	112	static
+clock.c:28:6:setFastClockConfig	112	static
