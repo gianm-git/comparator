@@ -78,11 +78,13 @@ UART_HandleTypeDef huart2;
 double counter=0.0;
 double frequency=1.0;
 int menuSelected=-5;
-double period=5.01;
+double period=1.0;
+int vector[300];
+int i=0;
 
 int countVect[300];
 
-_Bool eightyMHzClock=0;
+_Bool eightyMHzClock=1;
 
 /* USER CODE END PV */
 

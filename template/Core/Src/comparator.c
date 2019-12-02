@@ -8,8 +8,11 @@
 //the variable period is passed by reference
 void setSamplingTime(TIM_HandleTypeDef htim4,_Bool fastClockBoolean, double *period)
 {
+	long double clock;
+	long double timer_multiplied;
 	if (fastClockBoolean==1)
 	  {
+		  clock=80000000;
 		  //sample time for 80MHz=80 000 000
 		  //1   sec 	80 000 000
 		  //0.1 sec		 8 000 000
@@ -23,16 +26,19 @@ void setSamplingTime(TIM_HandleTypeDef htim4,_Bool fastClockBoolean, double *per
 		  Error_Handler();
 		  }
 
-		  *period=0.1;
+		  timer_multiplied=(htim4.Init.Prescaler)*(htim4.Init.Period);
+		  *period=timer_multiplied/clock;
+
+		  //*period=0.1;
 
 
 	  }
 	  else
 	  {
 		  //sample time for 20MHz = 20 000 000
-		  //  1 sec		20 000 000
-		  //0.1 sec		 2 000 000
-		  //0.01 sec	   200 000
+		  //	  1 sec		20 000 000
+		  //	0.1 sec		 2 000 000
+		  //   0.01 sec	   	   200 000
 
 		  htim4.Init.Prescaler = 2000;
 		  htim4.Init.Period = 1000;
@@ -42,7 +48,10 @@ void setSamplingTime(TIM_HandleTypeDef htim4,_Bool fastClockBoolean, double *per
 	      Error_Handler();
 		  }
 
-		  *period=0.1;
+		  timer_multiplied=(htim4.Init.Prescaler)*(htim4.Init.Period);
+		  *period=timer_multiplied/clock;
+
+		  //*period=0.1;
 
 
 
